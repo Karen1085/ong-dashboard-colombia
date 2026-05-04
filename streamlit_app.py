@@ -1,59 +1,44 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 import numpy as np
 
-# 1. CONFIGURACIÓN DE PÁGINA
-st.set_page_config(page_title="Dashboard Analítico", layout="wide", initial_sidebar_state="expanded")
+# 1. CONFIGURACION DE INTERFAZ CORPORATIVA (SLATE DARK)
+st.set_page_config(page_title="Inteligencia Territorial", layout="wide", initial_sidebar_state="expanded")
 
-# 2. INYECCIÓN CSS AVANZADA (ESTILO NEÓN / DEEP PURPLE)
 st.markdown("""
 <style>
-    /* Fondo principal y tipografía */
-    .stApp { background-color: #0b0710; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    /* Fondo gris corporativo, alta legibilidad */
+    .stApp { background-color: #1e1e24; font-family: 'Segoe UI', Tahoma, sans-serif; }
     
-    /* Panel Lateral (Sidebar) - Corrigiendo el contraste */
-    [data-testid="stSidebar"] { background-color: #130c1d !important; border-right: 1px solid #2a1b3d; }
-    [data-testid="stSidebar"] * { color: #d1d1d1 !important; } /* Letras grises/blancas legibles */
+    /* Panel lateral */
+    [data-testid="stSidebar"] { background-color: #2b2b36 !important; border-right: 1px solid #4a4a5a; }
+    [data-testid="stSidebar"] * { color: #f8f9fa !important; }
     
-    /* Cajas de selección (Multiselect) - Fondo oscuro y texto claro */
-    .stMultiSelect div[data-baseweb="select"] > div { background-color: #1a1025; color: white; border: 1px solid #3b2559; border-radius: 6px;}
+    /* Textos principales */
+    h1, h2, h3, h4 { color: #ffffff !important; font-weight: 500; font-size: 1.1rem; }
+    p, label { color: #ced4da !important; }
     
-    /* Títulos y textos generales */
-    h1, h2, h3, h4 { color: #f4f4f5 !important; font-weight: 600; letter-spacing: 0.5px;}
-    p { color: #a1a1aa; }
-    
-    /* Tarjetas de Métricas (KPIs) al estilo de tu imagen de referencia */
+    /* Tarjetas de Indicadores (KPIs) */
     div[data-testid="metric-container"] {
-        background-color: #160e22;
-        border-top: 3px solid #8a2be2; /* Borde superior neón morado */
-        border-radius: 8px;
-        padding: 15px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        background-color: #2b2b36;
+        border-left: 4px solid #3b82f6;
+        padding: 10px 15px;
+        border-radius: 4px;
     }
-    div[data-testid="metric-container"] label { color: #a1a1aa !important; font-size: 0.9rem;}
-    div[data-testid="metric-container"] div { color: #00e5ff !important; font-size: 1.8rem; font-weight: bold;} /* Números Cyan Neón */
+    div[data-testid="metric-container"] label { font-size: 0.85rem !important; }
+    div[data-testid="metric-container"] div { color: #ffffff !important; font-size: 1.5rem !important; }
     
-    /* Cajas de análisis estratégico */
-    .analysis-box {
-        background-color: #130c1d;
-        border-left: 3px solid #00e5ff; /* Acento Cyan */
-        padding: 15px;
-        font-size: 0.85rem;
-        color: #a1a1aa;
-        border-radius: 0 6px 6px 0;
-        margin-top: -10px; margin-bottom: 20px;
-    }
-    hr { border-color: #2a1b3d; }
+    /* Ajuste para 4 columnas */
+    .reportview-container .main .block-container { padding-top: 1rem; padding-bottom: 1rem; max-width: 98%; }
 </style>
 """, unsafe_allow_html=True)
 
-st.title("💠 Panel de Control: Productividad y Resiliencia Territorial")
-st.markdown("Monitoreo avanzado de indicadores agronómicos, riesgo climático y exposición a economías ilícitas.")
+st.title("Panel de Control: Productividad y Resiliencia Territorial")
+st.markdown("Monitoreo de indicadores agronómicos, evaluación de riesgo climático y exposición a economías ilícitas.")
 st.markdown("---")
 
-# 3. CARGA DE DATOS
+# 2. CARGA Y PREPARACION DE DATOS
 @st.cache_data
 def load_data():
     df = pd.read_excel("Base_Maestra_ONG_PowerBI.xlsx")
@@ -66,13 +51,13 @@ def load_data():
 
 df = load_data()
 
-# 4. PANEL LATERAL (FILTROS)
-st.sidebar.markdown("### ⚙️ Parámetros de Segmentación")
-depto_sel = st.sidebar.multiselect("Filtrar por Departamento", options=sorted(df['departamento'].dropna().unique()))
+# 3. PANEL LATERAL DE SEGMENTACION
+st.sidebar.markdown("### Filtros de Análisis")
+depto_sel = st.sidebar.multiselect("Departamento", options=sorted(df['departamento'].dropna().unique()))
 muni_options = sorted(df[df['departamento'].isin(depto_sel)]['municipio'].dropna().unique()) if depto_sel else sorted(df['municipio'].dropna().unique())
-muni_sel = st.sidebar.multiselect("Filtrar por Municipio", options=muni_options)
-cadena_sel = st.sidebar.multiselect("Filtrar por Cadena", options=sorted(df['cadena_productiva'].dropna().unique()))
-genero_sel = st.sidebar.multiselect("Filtrar por Género", options=sorted(df['genero'].dropna().unique()))
+muni_sel = st.sidebar.multiselect("Municipio", options=muni_options)
+cadena_sel = st.sidebar.multiselect("Cadena Productiva", options=sorted(df['cadena_productiva'].dropna().unique()))
+genero_sel = st.sidebar.multiselect("Género", options=sorted(df['genero'].dropna().unique()))
 
 df_filtered = df.copy()
 if depto_sel: df_filtered = df_filtered[df_filtered['departamento'].isin(depto_sel)]
@@ -80,7 +65,7 @@ if muni_sel: df_filtered = df_filtered[df_filtered['municipio'].isin(muni_sel)]
 if cadena_sel: df_filtered = df_filtered[df_filtered['cadena_productiva'].isin(cadena_sel)]
 if genero_sel: df_filtered = df_filtered[df_filtered['genero'].isin(genero_sel)]
 
-# 5. INDICADORES MACRO (KPIs)
+# 4. INDICADORES MACRO (KPIs)
 k1, k2, k3, k4, k5, k6 = st.columns(6)
 k1.metric("Volumen Productores", f"{len(df_filtered):,}")
 k2.metric("Superficie Total (Ha)", f"{df_filtered['area_ha'].sum():,.1f}")
@@ -89,62 +74,55 @@ k4.metric("Brecha Media", f"{df_filtered['brecha_productividad_%'].mean():.1f}%"
 vcr_mean = df_filtered['VCR'].mean() if 'VCR' in df_filtered.columns else 0.0
 k5.metric("Índice VCR", f"{vcr_mean:.2f}")
 pct_cert = (len(df_filtered[df_filtered['estado_certificacion'] == 'Certificado']) / len(df_filtered)) * 100 if len(df_filtered) > 0 else 0
-k6.metric("Tasa Certificación", f"{pct_cert:.1f}%")
+k6.metric("Certificación", f"{pct_cert:.1f}%")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# 6. CONFIGURACIÓN DE COLORES NEÓN PARA GRÁFICOS
-neon_colors = ['#00e5ff', '#b400ff', '#ff007f', '#00ff66'] # Cyan, Morado, Rosa, Verde neón
+# 5. MATRIZ VISUAL EN FILA UNICA (4 COLUMNAS)
+col1, col2, col3, col4 = st.columns(4)
 
-# 7. MATRIZ VISUAL PRINCIPAL
-row1_col1, row1_col2 = st.columns(2)
+# Paleta corporativa de colores
+corp_colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444']
 
-with row1_col1:
-    st.markdown("#### Radar Territorial de Riesgo Climático")
-    # Mapa optimizado: carto-darkmatter puro, con colores vibrantes
+with col1:
+    st.markdown("#### Radar Geográfico")
+    # Mapa OpenStreetMap para máxima visibilidad geográfica
     fig_map = px.scatter_mapbox(df_filtered, lat="latitud", lon="longitud", color="Vulnerabilidad CC", 
-                                size="produccion_kg", hover_name="municipio", hover_data=["perfil_espacial", "id_limpio"],
-                                mapbox_style="carto-darkmatter", zoom=4.5, 
-                                color_discrete_sequence=neon_colors, template="plotly_dark")
-    fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+                                size="produccion_kg", hover_name="municipio",
+                                mapbox_style="open-street-map", zoom=4)
+    fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, height=300, showlegend=False, paper_bgcolor='rgba(0,0,0,0)')
     st.plotly_chart(fig_map, use_container_width=True)
-    st.markdown("""<div class='analysis-box'><b>Análisis de Concentración:</b> La distribución geoespacial evidencia aglomeraciones de alto rendimiento (burbujas mayores) superpuestas en zonas de vulnerabilidad climática crítica. Indica un riesgo sistémico sobre la cadena de suministro, demandando infraestructura de mitigación prioritaria.</div>""", unsafe_allow_html=True)
 
-with row1_col2:
-    st.markdown("#### Eficiencia: Productividad vs. Ingresos")
+with col2:
+    st.markdown("#### Ingresos vs Productividad")
     fig_scatter = px.scatter(df_filtered, x="productividad_kg_ha", y="ingresos_anuales_cop", 
                              color="cadena_productiva", log_y=True,
-                             hover_data=["id_limpio", "genero"], color_discrete_sequence=neon_colors, template="plotly_dark")
-    fig_scatter.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
-    fig_scatter.update_traces(marker=dict(size=8, opacity=0.7, line=dict(width=1, color='White')))
+                             color_discrete_sequence=corp_colors, template="plotly_dark")
+    fig_scatter.update_layout(margin={"r":10,"t":10,"l":10,"b":10}, height=300, showlegend=False, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    fig_scatter.update_traces(marker=dict(size=6, opacity=0.8))
     st.plotly_chart(fig_scatter, use_container_width=True)
-    st.markdown("""<div class='analysis-box'><b>Análisis de Rentabilidad:</b> Correlación logarítmica positiva entre productividad física e ingresos. El sobreprecio estructural de los mercados formales es evidente en los estratos superiores, justificando la inversión técnica intensiva.</div>""", unsafe_allow_html=True)
 
-st.markdown("<br>", unsafe_allow_html=True)
-row2_col1, row2_col2 = st.columns(2)
-
-with row2_col1:
-    st.markdown("#### Cobertura Espacial del Dato")
+with col3:
+    st.markdown("#### Trazabilidad del Dato")
     df_quality = df_filtered['origen_coordenada'].value_counts().reset_index()
-    df_quality.columns = ['Estado de Trazabilidad', 'Volumen']
-    fig_quality = px.pie(df_quality, values='Volumen', names='Estado de Trazabilidad', hole=0.75,
-                         color_discrete_sequence=['#8a2be2', '#00e5ff'], template="plotly_dark")
-    fig_quality.update_traces(textposition='outside', textinfo='percent+label')
-    fig_quality.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', showlegend=False)
+    df_quality.columns = ['Estado', 'Volumen']
+    fig_quality = px.pie(df_quality, values='Volumen', names='Estado', hole=0.6,
+                         color_discrete_sequence=['#3b82f6', '#64748b'], template="plotly_dark")
+    fig_quality.update_traces(textposition='inside', textinfo='percent')
+    fig_quality.update_layout(margin={"r":0,"t":10,"l":0,"b":10}, height=300, showlegend=False, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     st.plotly_chart(fig_quality, use_container_width=True)
-    st.markdown("""<div class='analysis-box'><b>Auditoría de Calidad:</b> Proporción de recuperación de datos mediante imputación algorítmica espacial (KNN). Garantiza la robustez estadística y minimiza el sesgo de supervivencia en los registros.</div>""", unsafe_allow_html=True)
 
-with row2_col2:
-    st.markdown("#### Presión Ilegal vs. Brecha Productiva")
+with col4:
+    st.markdown("#### Entorno vs Brecha")
     fig_macro = px.scatter(df_filtered, x="promedio_coca_ha_5y", y="brecha_productividad_%", 
-                           color="cadena_productiva", size="area_ha", marginal_y="box",
-                           hover_data=["id_limpio", "municipio"], color_discrete_sequence=neon_colors, template="plotly_dark")
-    fig_macro.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+                           color="cadena_productiva", size="area_ha",
+                           color_discrete_sequence=corp_colors, template="plotly_dark")
+    fig_macro.update_layout(margin={"r":10,"t":10,"l":10,"b":10}, height=300, showlegend=False, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    fig_macro.update_traces(marker=dict(opacity=0.7))
     st.plotly_chart(fig_macro, use_container_width=True)
-    st.markdown("""<div class='analysis-box'><b>Análisis de Resiliencia:</b> Deterioro de la brecha productiva en municipios con alta densidad histórica de cultivos ilícitos. Se detectan clústers de resistencia (outliers) que logran mantener eficiencias positivas pese a la presión del entorno.</div>""", unsafe_allow_html=True)
 
 st.markdown("---")
 
-# 8. TABLA DE DATOS COMPACTA AL FINAL
-with st.expander("📂 VER MATRIZ DE DETALLE TRANSACCIONAL (ANONIMIZADA)", expanded=False):
-    st.dataframe(df_filtered[['id_limpio', 'departamento', 'municipio', 'cadena_productiva', 'genero', 'brecha_productividad_%', 'ingresos_anuales_cop']], height=250, use_container_width=True)
+# 6. MATRIZ DE DATOS COMPACTA Y DESLIZABLE
+st.markdown("#### Detalle Transaccional de Productores")
+st.dataframe(df_filtered[['id_limpio', 'departamento', 'municipio', 'cadena_productiva', 'genero', 'brecha_productividad_%', 'ingresos_anuales_cop']], height=200, use_container_width=True)
