@@ -153,7 +153,7 @@ color_genero = ['#ff007f', '#00e5ff']
 c1, c2, c3, c4 = st.columns(4)
 
 with c1:
-    st.markdown("#### Radar Geográfico")
+    st.markdown("#### Análisis Territorial")
     fig_map = px.scatter_mapbox(df_filtered, lat="latitud", lon="longitud", color="Vulnerabilidad CC", 
                                 size="produccion_kg", hover_name="municipio", 
                                 hover_data={"Vulnerabilidad CC": True, "produccion_kg": True, "latitud": False, "longitud": False},
