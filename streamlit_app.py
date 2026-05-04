@@ -118,7 +118,7 @@ layout_config = dict(
     paper_bgcolor='#170a29', 
     plot_bgcolor='#170a29',  
     font=dict(color="#d4c5e8", size=11), 
-    margin=dict(l=15, r=15, t=40, b=120), # Margen inferior asegurado para la leyenda
+    margin=dict(l=15, r=15, t=40, b=120), 
     xaxis=dict(showgrid=False, zeroline=False, color='#bbaacc', title_font=dict(color='#d4c5e8')), 
     yaxis=dict(showgrid=False, zeroline=False, color='#bbaacc', title_font=dict(color='#d4c5e8')), 
     legend=dict(font=dict(color="#d4c5e8"), title_font=dict(color="#d4c5e8"), orientation="h", yanchor="top", y=-0.35, xanchor="center", x=0.5) 
@@ -148,7 +148,7 @@ color_edad = ['#b400ff', '#00e5ff', '#ff8c00']
 color_genero = ['#ff007f', '#00e5ff'] 
 
 # ==========================================
-# 6. PRIMERA FILA: GRÁFICAS (SIN LOS TEXTOS AÚN)
+# 6. PRIMERA FILA: GRÁFICAS 
 # ==========================================
 c1, c2, c3, c4 = st.columns(4)
 
@@ -166,14 +166,13 @@ with c1:
 
 with c2:
     st.markdown("#### Ingresos vs Productividad")
-    # AÑADIDO: text="ingresos_anuales_cop"
+    # TEXTO ELIMINADO PARA LIMPIAR LA GRÁFICA
     fig_scatter = px.scatter(df_filtered, x="productividad_kg_ha", y="ingresos_anuales_cop", 
-                             color="cadena_productiva", log_y=True, text="ingresos_anuales_cop",
+                             color="cadena_productiva", log_y=True,
                              color_discrete_sequence=color_cadena, labels=nombres_ejes)
     fig_scatter.update_layout(**layout_config)
     fig_scatter.update_layout(showlegend=True, height=480, legend_title_text="")
-    # AÑADIDO: texttemplate para formato de moneda y position arriba
-    fig_scatter.update_traces(marker=dict(size=7, opacity=0.8, line=dict(width=1, color='White')), textposition='top center', texttemplate='$%{text:,.0f}', textfont=dict(color="#ffffff"))
+    fig_scatter.update_traces(marker=dict(size=7, opacity=0.8, line=dict(width=1, color='White')))
     st.plotly_chart(fig_scatter, use_container_width=True)
 
 with c3:
@@ -189,18 +188,17 @@ with c3:
 
 with c4:
     st.markdown("#### Entorno vs Brecha")
-    # AÑADIDO: text="brecha_productividad_%"
+    # TEXTO ELIMINADO PARA LIMPIAR LA GRÁFICA
     fig_macro = px.scatter(df_filtered, x="promedio_coca_ha_5y", y="brecha_productividad_%", 
-                           color="cadena_productiva", size="area_ha", text="brecha_productividad_%",
+                           color="cadena_productiva", size="area_ha",
                            color_discrete_sequence=color_cadena, labels=nombres_ejes)
     fig_macro.update_layout(**layout_config)
     fig_macro.update_layout(showlegend=True, height=480, legend_title_text="")
-    # AÑADIDO: texttemplate para formato de porcentaje y position arriba
-    fig_macro.update_traces(marker=dict(opacity=0.7, line=dict(width=1, color='White')), textposition='top center', texttemplate='%{text:.1f}%', textfont=dict(color="#ffffff"))
+    fig_macro.update_traces(marker=dict(opacity=0.7, line=dict(width=1, color='White')))
     st.plotly_chart(fig_macro, use_container_width=True)
 
 # ==========================================
-# 7. PRIMERA FILA: TEXTOS EXPLICATIVOS PERFECTAMENTE ALINEADOS
+# 7. PRIMERA FILA: TEXTOS EXPLICATIVOS
 # ==========================================
 t1, t2, t3, t4 = st.columns(4)
 with t1: st.markdown("<div class='grafica-explicacion'>Distribución de predios según nivel de Vulnerabilidad al Cambio Climático. Mapa centrado en Colombia.</div>", unsafe_allow_html=True)
@@ -211,7 +209,7 @@ with t4: st.markdown("<div class='grafica-explicacion'>Cruza la exposición a cu
 st.markdown("---")
 
 # ==========================================
-# 8. SEGUNDA FILA: GRÁFICAS (SIN LOS TEXTOS AÚN)
+# 8. SEGUNDA FILA: GRÁFICAS 
 # ==========================================
 c5, c6, c7, c8 = st.columns(4)
 
@@ -258,7 +256,7 @@ with c8:
     st.plotly_chart(fig_genero, use_container_width=True)
 
 # ==========================================
-# 9. SEGUNDA FILA: TEXTOS EXPLICATIVOS PERFECTAMENTE ALINEADOS
+# 9. SEGUNDA FILA: TEXTOS EXPLICATIVOS
 # ==========================================
 t5, t6, t7, t8 = st.columns(4)
 with t5: st.markdown("<div class='grafica-explicacion'>Distribución de productores según año de cosecha y estatus de certificación.</div>", unsafe_allow_html=True)
