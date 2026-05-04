@@ -267,5 +267,5 @@ with t8: st.markdown("<div class='grafica-explicacion'>An√°lisis de participaci√
 st.markdown("---")
 
 # 10. MATRIZ DE DATOS COMPACTA
-st.markdown("#### Matriz Transaccional de Productores")
+st.markdown("#### Matriz de Productores Anonimizado")
 st.dataframe(df_filtered[['id_limpio', 'departamento', 'municipio', 'cadena_productiva', 'genero', 'categoria_edad', 'estado_certificacion', 'Vulnerabilidad CC', 'brecha_productividad_%', 'ingresos_anuales_cop']], height=200, use_container_width=True)
