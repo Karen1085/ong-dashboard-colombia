@@ -201,7 +201,7 @@ with c4:
 # 7. PRIMERA FILA: TEXTOS EXPLICATIVOS
 # ==========================================
 t1, t2, t3, t4 = st.columns(4)
-with t1: st.markdown("<div class='grafica-explicacion'>Distribución de predios según nivel de Vulnerabilidad al Cambio Climático. Mapa centrado en Colombia.</div>", unsafe_allow_html=True)
+with t1: st.markdown("<div class='grafica-explicacion'>Visualiza la distribución geográfica de los productores junto con su nivel de vulnerabilidad climática. El tamaño de cada burbuja representa el volumen de producción, facilitando identificar las zonas donde se concentra la mayor parte de la producción del país y el nivel de riesgo ambiental al que están expuestos esos cultivos clave..</div>", unsafe_allow_html=True)
 with t2: st.markdown("<div class='grafica-explicacion'>Compara rendimiento físico frente al retorno financiero anual (escala logarítmica).</div>", unsafe_allow_html=True)
 with t3: st.markdown("<div class='grafica-explicacion'>Proporción de productores según su estado actual de certificación.</div>", unsafe_allow_html=True)
 with t4: st.markdown("<div class='grafica-explicacion'>Cruza la exposición a cultivos ilícitos (eje X) con la eficiencia agronómica (eje Y).</div>", unsafe_allow_html=True)
