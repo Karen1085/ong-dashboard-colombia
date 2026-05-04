@@ -78,32 +78,55 @@ if cert_sel: df_filtered = df_filtered[df_filtered['estado_certificacion'].isin(
 
 # 4. INDICADORES MACRO (KPIs)
 k1, k2, k3, k4, k5, k6 = st.columns(6)
-k1.metric("Volumen Productores", f"{len(df_filtered):,}")
+k1.metric("Total de Productores", f"{len(df_filtered):,}")
 k2.metric("Superficie Total (Ha)", f"{df_filtered['area_ha'].sum():,.1f}")
 k3.metric("Producción (Kg)", f"{df_filtered['produccion_kg'].sum():,.0f}")
-k4.metric("Brecha Media", f"{df_filtered['brecha_productividad_%'].mean():.1f}%")
+k4.metric("Brecha de Productividad Nacional Promedio", f"{df_filtered['brecha_productividad_%'].mean():.1f}%")
 vcr_mean = df_filtered['VCR'].mean() if 'VCR' in df_filtered.columns else 0.0
-k5.metric("Índice VCR", f"{vcr_mean:.2f}")
+k5.metric("Índice de Ventaja Comparativa Revelada", f"{vcr_mean:.2f}")
 horas_promedio = df_filtered['horas_capacitacion_2024'].mean() if 'horas_capacitacion_2024' in df_filtered.columns else 0
 k6.metric("Promedio Capacitación", f"{horas_promedio:.1f} Hrs")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Configuración global
+# 5. CONFIGURACIÓN DE NOMBRES Y COLORES PARA GRÁFICAS
 layout_config = dict(
     paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
     font=dict(color="#cccccc", size=10), margin=dict(l=10, r=10, t=30, b=10),
     xaxis=dict(showgrid=True, gridcolor='#333333'), yaxis=dict(showgrid=True, gridcolor='#333333')
 )
-corp_colors = ['#00acc1', '#ab47bc', '#ffa726', '#66bb6a', '#ef5350']
 
-# 5. PRIMERA FILA DE GRÁFICAS (4 COLUMNAS)
+# Diccionario para que los ejes tengan nombres amigables
+nombres_ejes = {
+    "productividad_kg_ha": "Productividad (Pnd kg / Area ha)",
+    "ingresos_anuales_cop": "Ingresos Anuales (COP)",
+    "promedio_coca_ha_5y": "Exposición a Cultivos Ilícitos (Ha)",
+    "brecha_productividad_%": "Brecha de Productividad (%)",
+    "año_cosecha": "Año de Cosecha",
+    "Cantidad": "Número de Productores",
+    "Volumen": "Total de Productores",
+    "categoria_edad": "Grupo Etario",
+    "horas_capacitacion_2024": "Promedio de Horas de Capacitación",
+    "año_ingreso_programa": "Año de Ingreso al Programa",
+    "cadena_productiva": "Cadena Productiva",
+    "estado_certificacion": "Estado de Certificación",
+    "genero": "Género"
+}
+
+# Paletas de colores independientes
+color_cadena = ['#00acc1', '#ab47bc', '#ffa726', '#66bb6a', '#ef5350']
+color_cert = ['#42a5f5', '#d4e157', '#ff7043'] # Azul, Lima, Naranja quemado
+color_edad = ['#8d6e63', '#78909c', '#9ccc65'] # Tonos neutros/tierra
+color_genero = ['#ec407a', '#5c6bc0'] # Rosado, Azul índigo
+
+# 6. PRIMERA FILA DE GRÁFICAS (4 COLUMNAS)
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     st.markdown("#### Radar Geográfico")
     fig_map = px.scatter_mapbox(df_filtered, lat="latitud", lon="longitud", color="Vulnerabilidad CC", 
-                                size="produccion_kg", hover_name="municipio", mapbox_style="open-street-map", zoom=4)
+                                size="produccion_kg", hover_name="municipio", mapbox_style="open-street-map", zoom=4,
+                                labels=nombres_ejes)
     fig_map.update_layout(**layout_config, showlegend=False, height=280)
     st.plotly_chart(fig_map, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Visualiza la distribución geográfica de los productores y su nivel de vulnerabilidad climática. El tamaño de la burbuja representa la producción.</div>", unsafe_allow_html=True)
@@ -111,9 +134,10 @@ with col1:
 with col2:
     st.markdown("#### Ingresos vs Productividad")
     fig_scatter = px.scatter(df_filtered, x="productividad_kg_ha", y="ingresos_anuales_cop", 
-                             color="cadena_productiva", log_y=True, color_discrete_sequence=corp_colors)
+                             color="cadena_productiva", log_y=True, text="ingresos_anuales_cop",
+                             color_discrete_sequence=color_cadena, labels=nombres_ejes)
     fig_scatter.update_layout(**layout_config, showlegend=False, height=280)
-    fig_scatter.update_traces(marker=dict(size=6, opacity=0.8))
+    fig_scatter.update_traces(marker=dict(size=6, opacity=0.8), textposition='top center', texttemplate='$%{text:,.0f}')
     st.plotly_chart(fig_scatter, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Compara el rendimiento físico frente al retorno financiero anual (escala logarítmica). Evidencia cómo la productividad sostenida empuja los ingresos.</div>", unsafe_allow_html=True)
 
@@ -121,7 +145,8 @@ with col3:
     st.markdown("#### Estado de Certificación")
     df_cert = df_filtered['estado_certificacion'].value_counts().reset_index()
     df_cert.columns = ['Estado', 'Volumen']
-    fig_cert = px.pie(df_cert, values='Volumen', names='Estado', hole=0.5, color_discrete_sequence=corp_colors)
+    fig_cert = px.pie(df_cert, values='Volumen', names='Estado', hole=0.5, 
+                      color_discrete_sequence=color_cert, labels=nombres_ejes)
     fig_cert.update_traces(textposition='inside', textinfo='percent+label', showlegend=False)
     fig_cert.update_layout(**layout_config, height=280)
     st.plotly_chart(fig_cert, use_container_width=True)
@@ -130,23 +155,26 @@ with col3:
 with col4:
     st.markdown("#### Entorno vs Brecha")
     fig_macro = px.scatter(df_filtered, x="promedio_coca_ha_5y", y="brecha_productividad_%", 
-                           color="cadena_productiva", size="area_ha", color_discrete_sequence=corp_colors)
+                           color="cadena_productiva", size="area_ha", text="brecha_productividad_%",
+                           color_discrete_sequence=color_cadena, labels=nombres_ejes)
     fig_macro.update_layout(**layout_config, showlegend=False, height=280)
-    fig_macro.update_traces(marker=dict(opacity=0.7))
+    fig_macro.update_traces(marker=dict(opacity=0.7), textposition='top center', texttemplate='%{text:.1f}%')
     st.plotly_chart(fig_macro, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Cruza la exposición a cultivos ilícitos (eje X) con la eficiencia agronómica (eje Y). Identifica clústers que mantienen eficiencias pese al entorno.</div>", unsafe_allow_html=True)
 
 st.markdown("---")
 
-# 6. SEGUNDA FILA DE GRÁFICAS (4 COLUMNAS)
+# 7. SEGUNDA FILA DE GRÁFICAS (4 COLUMNAS)
 col5, col6, col7, col8 = st.columns(4)
 
 with col5:
     st.markdown("#### Cosecha por Certificación")
     df_cosecha = df_filtered.groupby(['año_cosecha', 'estado_certificacion']).size().reset_index(name='Cantidad')
     fig_cosecha = px.bar(df_cosecha, x='año_cosecha', y='Cantidad', color='estado_certificacion', 
-                         text_auto=True, barmode='group', color_discrete_sequence=corp_colors)
+                         text='Cantidad', barmode='group', color_discrete_sequence=color_cert, labels=nombres_ejes)
     fig_cosecha.update_layout(**layout_config, height=280, legend=dict(orientation="h", y=-0.3, title=""))
+    # Asegura que el texto esté afuera, horizontal y no se corte
+    fig_cosecha.update_traces(textposition='outside', textangle=0, cliponaxis=False)
     st.plotly_chart(fig_cosecha, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Distribución de productores según el año de cosecha proyectada y su estatus de certificación actual.</div>", unsafe_allow_html=True)
 
@@ -154,15 +182,17 @@ with col6:
     st.markdown("#### Capacitación vs Edad")
     df_edad_cap = df_filtered.groupby('categoria_edad', observed=False)['horas_capacitacion_2024'].mean().reset_index()
     fig_edad = px.bar(df_edad_cap, x='categoria_edad', y='horas_capacitacion_2024', 
-                      text_auto='.1f', color='categoria_edad', color_discrete_sequence=['#ab47bc', '#00acc1', '#ffa726'])
+                      text='horas_capacitacion_2024', color='categoria_edad', 
+                      color_discrete_sequence=color_edad, labels=nombres_ejes)
     fig_edad.update_layout(**layout_config, showlegend=False, height=280)
+    fig_edad.update_traces(texttemplate='%{text:.1f}', textposition='outside', textangle=0, cliponaxis=False)
     st.plotly_chart(fig_edad, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Promedio de horas de asistencia técnica recibidas segmentado por rango etario, para evaluar el alcance poblacional.</div>", unsafe_allow_html=True)
 
 with col7:
     st.markdown("#### Ingreso al Programa")
     df_ingreso = df_filtered.groupby('año_ingreso_programa').size().reset_index(name='Volumen')
-    fig_ingreso = px.line(df_ingreso, x='año_ingreso_programa', y='Volumen', markers=True, text='Volumen')
+    fig_ingreso = px.line(df_ingreso, x='año_ingreso_programa', y='Volumen', markers=True, text='Volumen', labels=nombres_ejes)
     fig_ingreso.update_traces(textposition="top center", line=dict(color='#66bb6a', width=3), marker=dict(size=8))
     fig_ingreso.update_layout(**layout_config, height=280)
     fig_ingreso.update_xaxes(type='category')
@@ -173,13 +203,14 @@ with col8:
     st.markdown("#### Equidad por Cadena")
     df_genero = df_filtered.groupby(['cadena_productiva', 'genero']).size().reset_index(name='Cantidad')
     fig_genero = px.bar(df_genero, x='cadena_productiva', y='Cantidad', color='genero',
-                        text_auto=True, barmode='group', color_discrete_sequence=['#00acc1', '#ef5350'])
+                        text='Cantidad', barmode='group', color_discrete_sequence=color_genero, labels=nombres_ejes)
     fig_genero.update_layout(**layout_config, height=280, legend=dict(orientation="h", y=-0.3, title=""))
+    fig_genero.update_traces(textposition='outside', textangle=0, cliponaxis=False)
     st.plotly_chart(fig_genero, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Analiza la brecha de género mostrando la cantidad de participantes por sexo dentro de cada cultivo o cadena productiva.</div>", unsafe_allow_html=True)
 
 st.markdown("---")
 
-# 7. MATRIZ DE DATOS COMPACTA
+# 8. MATRIZ DE DATOS COMPACTA
 st.markdown("#### Matriz Transaccional de Productores")
-st.dataframe(df_filtered[['id_limpio', 'departamento', 'municipio', 'cadena_productiva', 'genero', 'categoria_edad', 'estado_certificacion', 'brecha_productividad_%', 'ingresos_anuales_cop']], height=200, use_container_width=True)
+st.dataframe(df_filtered[['id_limpio', 'departamento', 'municipio', 'cadena_productiva', 'genero', 'categoria_edad', 'estado_certificacion', 'brecha_productividad_%', 'ingresos_anuales_cop']], height=200, use_container_width=True)  
