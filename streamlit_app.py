@@ -214,7 +214,7 @@ st.markdown("---")
 c5, c6, c7, c8 = st.columns(4)
 
 with c5:
-    st.markdown("#### Cosecha por Certificación")
+    st.markdown("#### Cosecha/Certificación")
     df_cosecha = df_filtered.groupby(['año_cosecha', 'estado_certificacion']).size().reset_index(name='Cantidad')
     fig_cosecha = px.bar(df_cosecha, x='año_cosecha', y='Cantidad', color='estado_certificacion', 
                          text='Cantidad', barmode='group', color_discrete_sequence=color_cert, labels=nombres_ejes)
