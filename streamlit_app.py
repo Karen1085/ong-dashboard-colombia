@@ -4,7 +4,7 @@ import plotly.express as px
 import numpy as np
 
 # 1. CONFIGURACION DE INTERFAZ CORPORATIVA
-st.set_page_config(page_title="Inteligencia Territorial", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Dashboard Prueba Solidaridad Karen Atis", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
 <style>
