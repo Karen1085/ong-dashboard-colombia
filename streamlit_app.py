@@ -46,7 +46,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.title("Panel de Control: Productividad y Resiliencia Territorial")
+st.title("Productores Aliados Solidaridad Colombia")
 st.markdown("Monitoreo de indicadores agronómicos, evaluación de riesgo climático y exposición a economías ilícitas.")
 st.markdown("---")
 
@@ -235,5 +235,5 @@ with col8:
 st.markdown("---")
 
 # 8. MATRIZ DE DATOS COMPACTA
-st.markdown("#### Matriz Transaccional de Productores")
+st.markdown("#### Matriz de Productores Anonimizado")
 st.dataframe(df_filtered[['id_limpio', 'departamento', 'municipio', 'cadena_productiva', 'genero', 'categoria_edad', 'estado_certificacion', 'Vulnerabilidad CC', 'brecha_productividad_%', 'ingresos_anuales_cop']], height=200, use_container_width=True)
