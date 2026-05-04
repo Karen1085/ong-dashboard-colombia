@@ -31,7 +31,7 @@ st.markdown("""
     }
     div[data-testid="stMetricLabel"] { 
         font-size: 0.80rem !important; 
-        color: #ffffff !important; /* Blanco más fuerte para los títulos de los KPIs */
+        color: #ffffff !important; 
         white-space: normal !important; 
         line-height: 1.2 !important;
         margin-bottom: 5px;
@@ -108,11 +108,11 @@ st.markdown("<br>", unsafe_allow_html=True)
 layout_config = dict(
     paper_bgcolor='rgba(0,0,0,0)', 
     plot_bgcolor='rgba(0,0,0,0)',
-    font=dict(color="#ffffff", size=11), # <-- TEXTO BLANCO GENERAL
+    font=dict(color="#ffffff", size=11), 
     margin=dict(l=10, r=10, t=30, b=10),
-    xaxis=dict(showgrid=True, gridcolor='#333333', color='#ffffff', title_font=dict(color='#ffffff')), # <-- EJES BLANCOS
-    yaxis=dict(showgrid=True, gridcolor='#333333', color='#ffffff', title_font=dict(color='#ffffff')), # <-- EJES BLANCOS
-    legend=dict(font=dict(color="#ffffff"), title_font=dict(color="#ffffff")) # <-- LEYENDA BLANCA
+    xaxis=dict(showgrid=True, gridcolor='#333333', color='#ffffff', title_font=dict(color='#ffffff')), 
+    yaxis=dict(showgrid=True, gridcolor='#333333', color='#ffffff', title_font=dict(color='#ffffff')), 
+    legend=dict(font=dict(color="#ffffff"), title_font=dict(color="#ffffff")) 
 )
 
 nombres_ejes = {
@@ -153,7 +153,7 @@ with col2:
     fig_scatter = px.scatter(df_filtered, x="productividad_kg_ha", y="ingresos_anuales_cop", 
                              color="cadena_productiva", log_y=True,
                              color_discrete_sequence=color_cadena, labels=nombres_ejes)
-    fig_scatter.update_layout(**layout_config, showlegend=True, height=280, legend=dict(orientation="h", y=-0.3, title=""))
+    fig_scatter.update_layout(**layout_config, showlegend=True, height=280, legend_orientation="h", legend_y=-0.3, legend_title_text="")
     fig_scatter.update_traces(marker=dict(size=6, opacity=0.8))
     st.plotly_chart(fig_scatter, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Compara el rendimiento físico frente al retorno financiero anual (escala logarítmica). Evidencia cómo la productividad sostenida empuja los ingresos.</div>", unsafe_allow_html=True)
@@ -174,7 +174,7 @@ with col4:
     fig_macro = px.scatter(df_filtered, x="promedio_coca_ha_5y", y="brecha_productividad_%", 
                            color="cadena_productiva", size="area_ha",
                            color_discrete_sequence=color_cadena, labels=nombres_ejes)
-    fig_macro.update_layout(**layout_config, showlegend=True, height=280, legend=dict(orientation="h", y=-0.3, title=""))
+    fig_macro.update_layout(**layout_config, showlegend=True, height=280, legend_orientation="h", legend_y=-0.3, legend_title_text="")
     fig_macro.update_traces(marker=dict(opacity=0.7))
     st.plotly_chart(fig_macro, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Cruza la exposición a cultivos ilícitos (eje X) con la eficiencia agronómica (eje Y). Identifica clústers que mantienen eficiencias pese al entorno.</div>", unsafe_allow_html=True)
@@ -189,8 +189,7 @@ with col5:
     df_cosecha = df_filtered.groupby(['año_cosecha', 'estado_certificacion']).size().reset_index(name='Cantidad')
     fig_cosecha = px.bar(df_cosecha, x='año_cosecha', y='Cantidad', color='estado_certificacion', 
                          text='Cantidad', barmode='group', color_discrete_sequence=color_cert, labels=nombres_ejes)
-    fig_cosecha.update_layout(**layout_config, height=280, legend=dict(orientation="h", y=-0.3, title=""))
-    # Añadido insidetextfont dict para forzar el número de la barra a blanco también
+    fig_cosecha.update_layout(**layout_config, height=280, legend_orientation="h", legend_y=-0.3, legend_title_text="")
     fig_cosecha.update_traces(textposition='outside', textangle=0, cliponaxis=False, textfont=dict(color="#ffffff"))
     st.plotly_chart(fig_cosecha, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Distribución de productores según el año de cosecha proyectada y su estatus de certificación actual.</div>", unsafe_allow_html=True)
@@ -221,7 +220,7 @@ with col8:
     df_genero = df_filtered.groupby(['cadena_productiva', 'genero']).size().reset_index(name='Cantidad')
     fig_genero = px.bar(df_genero, x='cadena_productiva', y='Cantidad', color='genero',
                         text='Cantidad', barmode='group', color_discrete_sequence=color_genero, labels=nombres_ejes)
-    fig_genero.update_layout(**layout_config, height=280, legend=dict(orientation="h", y=-0.3, title=""))
+    fig_genero.update_layout(**layout_config, height=280, legend_orientation="h", legend_y=-0.3, legend_title_text="")
     fig_genero.update_traces(textposition='outside', textangle=0, cliponaxis=False, textfont=dict(color="#ffffff"))
     st.plotly_chart(fig_genero, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Analiza la brecha de género mostrando la cantidad de participantes por sexo dentro de cada cultivo o cadena productiva.</div>", unsafe_allow_html=True)
