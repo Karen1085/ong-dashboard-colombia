@@ -105,7 +105,7 @@ k1, k2, k3, k4, k5, k6 = st.columns(6)
 k1.metric("Total de Productores", f"{len(df_filtered):,}")
 k2.metric("Superficie Total (Ha)", f"{df_filtered['area_ha'].sum():,.1f}")
 k3.metric("Producción (Kg)", f"{df_filtered['produccion_kg'].sum():,.0f}")
-k4.metric("Brecha Productividad Nacional", f"{df_filtered['brecha_productividad_%'].mean():.1f}%")
+k4.metric("Brecha Productividad", f"{df_filtered['brecha_productividad_%'].mean():.1f}%")
 vcr_mean = df_filtered['VCR'].mean() if 'VCR' in df_filtered.columns else 0.0
 k5.metric("Índice Ventaja Comparativa", f"{vcr_mean:.2f}")
 horas_promedio = df_filtered['horas_capacitacion_2024'].mean() if 'horas_capacitacion_2024' in df_filtered.columns else 0
