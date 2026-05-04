@@ -3,8 +3,8 @@ import pandas as pd
 import plotly.express as px
 import numpy as np
 
-# 1. CONFIGURACION DE INTERFAZ CORPORATIVA
-st.set_page_config(page_title="Dashboard Prueba Solidaridad Karen Atis", layout="wide", initial_sidebar_state="expanded")
+# 1. CONFIGURACIÓN DE INTERFAZ CORPORATIVA
+st.set_page_config(page_title="Inteligencia Territorial", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
 <style>
@@ -46,13 +46,14 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.title("Productores Aliados Solidaridad Colombia")
+st.title("Panel de Control: Productividad y Resiliencia Territorial")
 st.markdown("Monitoreo de indicadores agronómicos, evaluación de riesgo climático y exposición a economías ilícitas.")
 st.markdown("---")
 
-# 2. CARGA Y PREPARACION DE DATOS
+# 2. CARGA Y PREPARACIÓN DE DATOS
 @st.cache_data
 def load_data():
+    # Asegúrate de que el archivo excel esté en la misma carpeta
     df = pd.read_excel("Base_Maestra_ONG_PowerBI.xlsx")
     
     if 'id_limpio' in df.columns:
@@ -63,9 +64,7 @@ def load_data():
     if 'origen_coordenada' not in df.columns:
         np.random.seed(42)
         df['origen_coordenada'] = np.where(np.random.rand(len(df)) > 0.15, 'Coordenada Original', 'Imputación Espacial')
-    if 'perfil_espacial' not in df.columns:
-        df['perfil_espacial'] = np.where(df['brecha_productividad_%'] > 0, 'Líder Local', 'Riesgo Técnico')
-        
+    
     if 'edad' in df.columns:
         bins = [0, 35, 55, 120]
         labels = ['Joven (<35)', 'Adulto (35-55)', 'Mayor (>55)']
@@ -75,7 +74,7 @@ def load_data():
 
 df = load_data()
 
-# 3. PANEL LATERAL DE SEGMENTACION
+# 3. PANEL LATERAL DE SEGMENTACIÓN
 st.sidebar.markdown("### Filtros de Análisis")
 depto_sel = st.sidebar.multiselect("Departamento", options=sorted(df['departamento'].dropna().unique()))
 muni_options = sorted(df[df['departamento'].isin(depto_sel)]['municipio'].dropna().unique()) if depto_sel else sorted(df['municipio'].dropna().unique())
@@ -83,7 +82,6 @@ muni_sel = st.sidebar.multiselect("Municipio", options=muni_options)
 cadena_sel = st.sidebar.multiselect("Cadena Productiva", options=sorted(df['cadena_productiva'].dropna().unique()))
 genero_sel = st.sidebar.multiselect("Género", options=sorted(df['genero'].dropna().unique()))
 cert_sel = st.sidebar.multiselect("Estado Certificación", options=sorted(df['estado_certificacion'].dropna().astype(str).unique()))
-# NUEVO FILTRO DE VULNERABILIDAD
 vuln_sel = st.sidebar.multiselect("Vulnerabilidad Cambio Climático", options=sorted(df['Vulnerabilidad CC'].dropna().unique()))
 
 df_filtered = df.copy()
@@ -107,7 +105,7 @@ k6.metric("Promedio Capacitación", f"{horas_promedio:.1f} Hrs")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# 5. CONFIGURACIÓN DE NOMBRES, COLORES Y ETIQUETAS BLANCAS PARA GRÁFICAS
+# 5. CONFIGURACIÓN GLOBAL DE GRÁFICAS (ETIQUETAS BLANCAS)
 layout_config = dict(
     paper_bgcolor='rgba(0,0,0,0)', 
     plot_bgcolor='rgba(0,0,0,0)',
@@ -148,12 +146,13 @@ with col1:
     fig_map = px.scatter_mapbox(df_filtered, lat="latitud", lon="longitud", color="Vulnerabilidad CC", 
                                 size="produccion_kg", hover_name="municipio", 
                                 hover_data={"Vulnerabilidad CC": True, "produccion_kg": True, "latitud": False, "longitud": False},
-                                mapbox_style="open-street-map", zoom=4,
+                                mapbox_style="open-street-map", 
+                                zoom=4.5, center={"lat": 4.5709, "lon": -74.2973},
                                 labels=nombres_ejes, color_discrete_sequence=px.colors.qualitative.Safe)
-    # Activamos leyenda para que se vean los labels de vulnerabilidad
-    fig_map.update_layout(**layout_config, showlegend=True, legend_orientation="h", legend_y=-0.1, height=280)
+    
+    fig_map.update_layout(**layout_config, showlegend=True, legend_orientation="h", legend_y=-0.1, height=280, margin=dict(l=0, r=0, t=0, b=0))
     st.plotly_chart(fig_map, use_container_width=True)
-    st.markdown("<div class='grafica-explicacion'>Distribución de predios según su nivel de Vulnerabilidad al Cambio Climático. Los colores indican el grado de riesgo y el tamaño la producción.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='grafica-explicacion'>Distribución de predios según su nivel de Vulnerabilidad al Cambio Climático. Los colores indican el grado de riesgo.</div>", unsafe_allow_html=True)
 
 with col2:
     st.markdown("#### Ingresos vs Productividad")
@@ -163,7 +162,7 @@ with col2:
     fig_scatter.update_layout(**layout_config, showlegend=True, height=280, legend_orientation="h", legend_y=-0.3, legend_title_text="")
     fig_scatter.update_traces(marker=dict(size=6, opacity=0.8))
     st.plotly_chart(fig_scatter, use_container_width=True)
-    st.markdown("<div class='grafica-explicacion'>Compara el rendimiento físico frente al retorno financiero anual (escala logarítmica). Evidencia cómo la productividad sostenida empuja los ingresos.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='grafica-explicacion'>Compara el rendimiento físico frente al retorno financiero anual (escala logarítmica).</div>", unsafe_allow_html=True)
 
 with col3:
     st.markdown("#### Estado de Certificación")
@@ -174,7 +173,7 @@ with col3:
     fig_cert.update_traces(textposition='inside', textinfo='percent+label', showlegend=False)
     fig_cert.update_layout(**layout_config, height=280)
     st.plotly_chart(fig_cert, use_container_width=True)
-    st.markdown("<div class='grafica-explicacion'>Proporción de productores según su estado actual de certificación (Certificado, En Proceso, No Certificado).</div>", unsafe_allow_html=True)
+    st.markdown("<div class='grafica-explicacion'>Proporción de productores según su estado actual de certificación.</div>", unsafe_allow_html=True)
 
 with col4:
     st.markdown("#### Entorno vs Brecha")
@@ -199,7 +198,7 @@ with col5:
     fig_cosecha.update_layout(**layout_config, height=280, legend_orientation="h", legend_y=-0.3, legend_title_text="")
     fig_cosecha.update_traces(textposition='outside', textangle=0, cliponaxis=False, textfont=dict(color="#ffffff"))
     st.plotly_chart(fig_cosecha, use_container_width=True)
-    st.markdown("<div class='grafica-explicacion'>Distribución de productores según el año de cosecha proyectada y su estatus de certificación actual.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='grafica-explicacion'>Distribución de productores según año de cosecha y estatus de certificación.</div>", unsafe_allow_html=True)
 
 with col6:
     st.markdown("#### Capacitación vs Edad")
@@ -210,7 +209,7 @@ with col6:
     fig_edad.update_layout(**layout_config, showlegend=False, height=280)
     fig_edad.update_traces(texttemplate='%{text:.1f}', textposition='outside', textangle=0, cliponaxis=False, textfont=dict(color="#ffffff"))
     st.plotly_chart(fig_edad, use_container_width=True)
-    st.markdown("<div class='grafica-explicacion'>Promedio de horas de asistencia técnica recibidas segmentado por rango etario.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='grafica-explicacion'>Promedio de horas de capacitación recibidas segmentado por rango etario.</div>", unsafe_allow_html=True)
 
 with col7:
     st.markdown("#### Ingreso al Programa")
@@ -220,7 +219,7 @@ with col7:
     fig_ingreso.update_layout(**layout_config, height=280)
     fig_ingreso.update_xaxes(type='category')
     st.plotly_chart(fig_ingreso, use_container_width=True)
-    st.markdown("<div class='grafica-explicacion'>Evolución temporal histórica del volumen de productores adheridos anualmente al programa.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='grafica-explicacion'>Evolución histórica del volumen de productores adheridos al programa.</div>", unsafe_allow_html=True)
 
 with col8:
     st.markdown("#### Equidad por Cadena")
@@ -230,10 +229,10 @@ with col8:
     fig_genero.update_layout(**layout_config, height=280, legend_orientation="h", legend_y=-0.3, legend_title_text="")
     fig_genero.update_traces(textposition='outside', textangle=0, cliponaxis=False, textfont=dict(color="#ffffff"))
     st.plotly_chart(fig_genero, use_container_width=True)
-    st.markdown("<div class='grafica-explicacion'>Analiza la participación por sexo dentro de cada cadena productiva.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='grafica-explicacion'>Análisis de participación por sexo dentro de cada cadena productiva.</div>", unsafe_allow_html=True)
 
 st.markdown("---")
 
 # 8. MATRIZ DE DATOS COMPACTA
-st.markdown("#### Matriz de Productores Anonimizado")
+st.markdown("#### Matriz Transaccional de Productores")
 st.dataframe(df_filtered[['id_limpio', 'departamento', 'municipio', 'cadena_productiva', 'genero', 'categoria_edad', 'estado_certificacion', 'Vulnerabilidad CC', 'brecha_productividad_%', 'ingresos_anuales_cop']], height=200, use_container_width=True)
