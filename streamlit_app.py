@@ -145,11 +145,11 @@ with col1:
     fig_map = px.scatter_mapbox(df_filtered, lat="latitud", lon="longitud", color="Vulnerabilidad CC", 
                                 size="produccion_kg", hover_name="municipio", 
                                 hover_data={"Vulnerabilidad CC": True, "produccion_kg": True, "latitud": False, "longitud": False},
-                                mapbox_style="open-street-map", zoom=4.5, center={"lat": 4.5709, "lon": -74.2973},
+                                mapbox_style="open-street-map", 
+                                zoom=3.5, center={"lat": 4.0, "lon": -73.5}, # <-- Zoom alejado y centro ajustado
                                 labels=nombres_ejes, color_discrete_sequence=px.colors.qualitative.Safe)
-    # Aplicación en dos pasos para evitar conflictos de argumentos duplicados
     fig_map.update_layout(**layout_config)
-    fig_map.update_layout(showlegend=True, legend_orientation="h", legend_y=-0.1, height=280, margin=dict(l=0, r=0, t=0, b=0))
+    fig_map.update_layout(showlegend=True, legend_orientation="h", legend_y=-0.2, height=280, margin=dict(l=0, r=0, t=0, b=0))
     st.plotly_chart(fig_map, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Distribución de predios según nivel de Vulnerabilidad al Cambio Climático. Mapa centrado en Colombia.</div>", unsafe_allow_html=True)
 
