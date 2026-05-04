@@ -55,7 +55,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.title("Panel de Control: Productividad y Resiliencia Territorial")
+st.title("Productores Aliados Solidaridad Colombia")
 st.markdown("Monitoreo de indicadores agronómicos, evaluación de riesgo climático y exposición a economías ilícitas.")
 st.markdown("---")
 
