@@ -53,7 +53,6 @@ st.markdown("---")
 # 2. CARGA Y PREPARACIÓN DE DATOS
 @st.cache_data
 def load_data():
-    # Asegúrate de que el archivo excel esté en la misma carpeta
     df = pd.read_excel("Base_Maestra_ONG_PowerBI.xlsx")
     
     if 'id_limpio' in df.columns:
@@ -105,7 +104,7 @@ k6.metric("Promedio Capacitación", f"{horas_promedio:.1f} Hrs")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# 5. CONFIGURACIÓN GLOBAL DE GRÁFICAS (ETIQUETAS BLANCAS)
+# 5. CONFIGURACIÓN GLOBAL DE GRÁFICAS
 layout_config = dict(
     paper_bgcolor='rgba(0,0,0,0)', 
     plot_bgcolor='rgba(0,0,0,0)',
@@ -146,23 +145,24 @@ with col1:
     fig_map = px.scatter_mapbox(df_filtered, lat="latitud", lon="longitud", color="Vulnerabilidad CC", 
                                 size="produccion_kg", hover_name="municipio", 
                                 hover_data={"Vulnerabilidad CC": True, "produccion_kg": True, "latitud": False, "longitud": False},
-                                mapbox_style="open-street-map", 
-                                zoom=4.5, center={"lat": 4.5709, "lon": -74.2973},
+                                mapbox_style="open-street-map", zoom=4.5, center={"lat": 4.5709, "lon": -74.2973},
                                 labels=nombres_ejes, color_discrete_sequence=px.colors.qualitative.Safe)
-    
-    fig_map.update_layout(**layout_config, showlegend=True, legend_orientation="h", legend_y=-0.1, height=280, margin=dict(l=0, r=0, t=0, b=0))
+    # Aplicación en dos pasos para evitar conflictos de argumentos duplicados
+    fig_map.update_layout(**layout_config)
+    fig_map.update_layout(showlegend=True, legend_orientation="h", legend_y=-0.1, height=280, margin=dict(l=0, r=0, t=0, b=0))
     st.plotly_chart(fig_map, use_container_width=True)
-    st.markdown("<div class='grafica-explicacion'>Distribución de predios según su nivel de Vulnerabilidad al Cambio Climático. Los colores indican el grado de riesgo.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='grafica-explicacion'>Distribución de predios según nivel de Vulnerabilidad al Cambio Climático. Mapa centrado en Colombia.</div>", unsafe_allow_html=True)
 
 with col2:
     st.markdown("#### Ingresos vs Productividad")
     fig_scatter = px.scatter(df_filtered, x="productividad_kg_ha", y="ingresos_anuales_cop", 
                              color="cadena_productiva", log_y=True,
                              color_discrete_sequence=color_cadena, labels=nombres_ejes)
-    fig_scatter.update_layout(**layout_config, showlegend=True, height=280, legend_orientation="h", legend_y=-0.3, legend_title_text="")
+    fig_scatter.update_layout(**layout_config)
+    fig_scatter.update_layout(showlegend=True, height=280, legend_orientation="h", legend_y=-0.3, legend_title_text="")
     fig_scatter.update_traces(marker=dict(size=6, opacity=0.8))
     st.plotly_chart(fig_scatter, use_container_width=True)
-    st.markdown("<div class='grafica-explicacion'>Compara el rendimiento físico frente al retorno financiero anual (escala logarítmica).</div>", unsafe_allow_html=True)
+    st.markdown("<div class='grafica-explicacion'>Compara rendimiento físico frente al retorno financiero anual (escala logarítmica).</div>", unsafe_allow_html=True)
 
 with col3:
     st.markdown("#### Estado de Certificación")
@@ -180,7 +180,8 @@ with col4:
     fig_macro = px.scatter(df_filtered, x="promedio_coca_ha_5y", y="brecha_productividad_%", 
                            color="cadena_productiva", size="area_ha",
                            color_discrete_sequence=color_cadena, labels=nombres_ejes)
-    fig_macro.update_layout(**layout_config, showlegend=True, height=280, legend_orientation="h", legend_y=-0.3, legend_title_text="")
+    fig_macro.update_layout(**layout_config)
+    fig_macro.update_layout(showlegend=True, height=280, legend_orientation="h", legend_y=-0.3, legend_title_text="")
     fig_macro.update_traces(marker=dict(opacity=0.7))
     st.plotly_chart(fig_macro, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Cruza la exposición a cultivos ilícitos (eje X) con la eficiencia agronómica (eje Y).</div>", unsafe_allow_html=True)
@@ -195,7 +196,8 @@ with col5:
     df_cosecha = df_filtered.groupby(['año_cosecha', 'estado_certificacion']).size().reset_index(name='Cantidad')
     fig_cosecha = px.bar(df_cosecha, x='año_cosecha', y='Cantidad', color='estado_certificacion', 
                          text='Cantidad', barmode='group', color_discrete_sequence=color_cert, labels=nombres_ejes)
-    fig_cosecha.update_layout(**layout_config, height=280, legend_orientation="h", legend_y=-0.3, legend_title_text="")
+    fig_cosecha.update_layout(**layout_config)
+    fig_cosecha.update_layout(height=280, legend_orientation="h", legend_y=-0.3, legend_title_text="")
     fig_cosecha.update_traces(textposition='outside', textangle=0, cliponaxis=False, textfont=dict(color="#ffffff"))
     st.plotly_chart(fig_cosecha, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Distribución de productores según año de cosecha y estatus de certificación.</div>", unsafe_allow_html=True)
@@ -226,7 +228,8 @@ with col8:
     df_genero = df_filtered.groupby(['cadena_productiva', 'genero']).size().reset_index(name='Cantidad')
     fig_genero = px.bar(df_genero, x='cadena_productiva', y='Cantidad', color='genero',
                         text='Cantidad', barmode='group', color_discrete_sequence=color_genero, labels=nombres_ejes)
-    fig_genero.update_layout(**layout_config, height=280, legend_orientation="h", legend_y=-0.3, legend_title_text="")
+    fig_genero.update_layout(**layout_config)
+    fig_genero.update_layout(height=280, legend_orientation="h", legend_y=-0.3, legend_title_text="")
     fig_genero.update_traces(textposition='outside', textangle=0, cliponaxis=False, textfont=dict(color="#ffffff"))
     st.plotly_chart(fig_genero, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Análisis de participación por sexo dentro de cada cadena productiva.</div>", unsafe_allow_html=True)
