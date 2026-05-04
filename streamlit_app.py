@@ -4,7 +4,7 @@ import plotly.express as px
 import numpy as np
 
 # 1. CONFIGURACIÓN DE INTERFAZ CORPORATIVA (ESTILO CYBERPUNK / NEON)
-st.set_page_config(page_title="Inteligencia Territorial", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Prueba Técnica Karen Atis", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
 <style>
