@@ -29,10 +29,10 @@ st.markdown("""
     
     /* Tarjetas de Indicadores (KPIs) estilo Neon */
     div[data-testid="metric-container"] { 
-        background-color: #170a29; /* Fondo de tarjeta */
-        border-top: 3px solid #b400ff; /* Acento neón arriba */
+        background-color: #170a29; 
+        border-top: 3px solid #b400ff; 
         padding: 15px 15px; 
-        border-radius: 8px; /* Bordes más curvos */
+        border-radius: 8px; 
         box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
     div[data-testid="stMetricLabel"] { 
@@ -45,7 +45,7 @@ st.markdown("""
         line-height: 1.2 !important;
     }
     div[data-testid="stMetricValue"] > div { 
-        color: #00e5ff !important; /* Cian neón para los números */
+        color: #00e5ff !important; 
         font-size: 1.5rem !important; 
         font-weight: bold;
     }
@@ -113,15 +113,17 @@ k6.metric("Promedio Capacitación", f"{horas_promedio:.1f} Hrs")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# 5. CONFIGURACIÓN GLOBAL DE GRÁFICAS (TARJETAS NEÓN)
+# 5. CONFIGURACIÓN GLOBAL DE GRÁFICAS (MÁRGENES MÁS AMPLIOS PARA TEXTOS)
 layout_config = dict(
-    paper_bgcolor='#170a29', # Fondo de tarjeta
-    plot_bgcolor='#170a29',  # Fondo interno
+    paper_bgcolor='#170a29', 
+    plot_bgcolor='#170a29',  
     font=dict(color="#d4c5e8", size=11), 
-    margin=dict(l=15, r=15, t=40, b=15),
-    xaxis=dict(showgrid=False, zeroline=False, color='#bbaacc', title_font=dict(color='#d4c5e8')), # Grid apagado
-    yaxis=dict(showgrid=False, zeroline=False, color='#bbaacc', title_font=dict(color='#d4c5e8')), # Grid apagado
-    legend=dict(font=dict(color="#d4c5e8"), title_font=dict(color="#d4c5e8")) 
+    # Aumentamos el margen inferior (b=130) para que quepan las etiquetas rotadas, el título del eje y la leyenda
+    margin=dict(l=15, r=15, t=40, b=130), 
+    xaxis=dict(showgrid=False, zeroline=False, color='#bbaacc', title_font=dict(color='#d4c5e8')), 
+    yaxis=dict(showgrid=False, zeroline=False, color='#bbaacc', title_font=dict(color='#d4c5e8')), 
+    # Bajamos la leyenda un poco más (y=-0.35) para que no choque con el nombre del eje X
+    legend=dict(font=dict(color="#d4c5e8"), title_font=dict(color="#d4c5e8"), orientation="h", yanchor="top", y=-0.35, xanchor="center", x=0.5) 
 )
 
 nombres_ejes = {
@@ -147,7 +149,7 @@ color_cert = ['#00e5ff', '#39ff14', '#ff007f']
 color_edad = ['#b400ff', '#00e5ff', '#ff8c00'] 
 color_genero = ['#ff007f', '#00e5ff'] 
 
-# 6. PRIMERA FILA DE GRÁFICAS (4 COLUMNAS)
+# 6. PRIMERA FILA DE GRÁFICAS (4 COLUMNAS) - AUMENTAMOS HEIGHT A 480
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
@@ -155,11 +157,11 @@ with col1:
     fig_map = px.scatter_mapbox(df_filtered, lat="latitud", lon="longitud", color="Vulnerabilidad CC", 
                                 size="produccion_kg", hover_name="municipio", 
                                 hover_data={"Vulnerabilidad CC": True, "produccion_kg": True, "latitud": False, "longitud": False},
-                                mapbox_style="carto-darkmatter", # Estilo de mapa oscuro nativo
+                                mapbox_style="open-street-map",
                                 zoom=3.5, center={"lat": 4.0, "lon": -73.5},
                                 labels=nombres_ejes, color_discrete_sequence=color_cadena)
     fig_map.update_layout(**layout_config)
-    fig_map.update_layout(showlegend=True, legend_orientation="h", legend_y=-0.2, height=300, margin=dict(l=0, r=0, t=0, b=0))
+    fig_map.update_layout(showlegend=True, height=480, margin=dict(l=0, r=0, t=0, b=130), legend_title_text="")
     st.plotly_chart(fig_map, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Distribución de predios según nivel de Vulnerabilidad al Cambio Climático. Mapa centrado en Colombia.</div>", unsafe_allow_html=True)
 
@@ -169,7 +171,7 @@ with col2:
                              color="cadena_productiva", log_y=True,
                              color_discrete_sequence=color_cadena, labels=nombres_ejes)
     fig_scatter.update_layout(**layout_config)
-    fig_scatter.update_layout(showlegend=True, height=300, legend_orientation="h", legend_y=-0.3, legend_title_text="")
+    fig_scatter.update_layout(showlegend=True, height=480, legend_title_text="")
     fig_scatter.update_traces(marker=dict(size=7, opacity=0.8, line=dict(width=1, color='White')))
     st.plotly_chart(fig_scatter, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Compara rendimiento físico frente al retorno financiero anual (escala logarítmica).</div>", unsafe_allow_html=True)
@@ -181,7 +183,8 @@ with col3:
     fig_cert = px.pie(df_cert, values='Volumen', names='Estado', hole=0.6, 
                       color_discrete_sequence=color_cert, labels=nombres_ejes)
     fig_cert.update_traces(textposition='inside', textinfo='percent+label', showlegend=False, marker=dict(line=dict(color='#170a29', width=2)))
-    fig_cert.update_layout(**layout_config, height=300)
+    fig_cert.update_layout(**layout_config)
+    fig_cert.update_layout(height=480, showlegend=False)
     st.plotly_chart(fig_cert, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Proporción de productores según su estado actual de certificación.</div>", unsafe_allow_html=True)
 
@@ -191,14 +194,14 @@ with col4:
                            color="cadena_productiva", size="area_ha",
                            color_discrete_sequence=color_cadena, labels=nombres_ejes)
     fig_macro.update_layout(**layout_config)
-    fig_macro.update_layout(showlegend=True, height=300, legend_orientation="h", legend_y=-0.3, legend_title_text="")
+    fig_macro.update_layout(showlegend=True, height=480, legend_title_text="")
     fig_macro.update_traces(marker=dict(opacity=0.7, line=dict(width=1, color='White')))
     st.plotly_chart(fig_macro, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Cruza la exposición a cultivos ilícitos (eje X) con la eficiencia agronómica (eje Y).</div>", unsafe_allow_html=True)
 
 st.markdown("---")
 
-# 7. SEGUNDA FILA DE GRÁFICAS (4 COLUMNAS)
+# 7. SEGUNDA FILA DE GRÁFICAS (4 COLUMNAS) - AUMENTAMOS HEIGHT A 480
 col5, col6, col7, col8 = st.columns(4)
 
 with col5:
@@ -207,7 +210,8 @@ with col5:
     fig_cosecha = px.bar(df_cosecha, x='año_cosecha', y='Cantidad', color='estado_certificacion', 
                          text='Cantidad', barmode='group', color_discrete_sequence=color_cert, labels=nombres_ejes)
     fig_cosecha.update_layout(**layout_config)
-    fig_cosecha.update_layout(height=300, legend_orientation="h", legend_y=-0.3, legend_title_text="")
+    fig_cosecha.update_layout(height=480, legend_title_text="")
+    # Ya no ocultamos el eje X
     fig_cosecha.update_traces(textposition='outside', textangle=0, cliponaxis=False, textfont=dict(color="#ffffff"))
     st.plotly_chart(fig_cosecha, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Distribución de productores según año de cosecha y estatus de certificación.</div>", unsafe_allow_html=True)
@@ -218,7 +222,9 @@ with col6:
     fig_edad = px.bar(df_edad_cap, x='categoria_edad', y='horas_capacitacion_2024', 
                       text='horas_capacitacion_2024', color='categoria_edad', 
                       color_discrete_sequence=color_edad, labels=nombres_ejes)
-    fig_edad.update_layout(**layout_config, showlegend=False, height=300)
+    fig_edad.update_layout(**layout_config)
+    fig_edad.update_layout(height=480, showlegend=False)
+    # Ya no ocultamos el eje X
     fig_edad.update_traces(texttemplate='%{text:.1f}', textposition='outside', textangle=0, cliponaxis=False, textfont=dict(color="#ffffff"))
     st.plotly_chart(fig_edad, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Promedio de horas de capacitación recibidas segmentado por rango etario.</div>", unsafe_allow_html=True)
@@ -226,14 +232,14 @@ with col6:
 with col7:
     st.markdown("#### Ingreso al Programa")
     df_ingreso = df_filtered.groupby('año_ingreso_programa').size().reset_index(name='Volumen')
-    # Gráfico de Área Suavizado (Spline)
     fig_ingreso = px.area(df_ingreso, x='año_ingreso_programa', y='Volumen', text='Volumen', labels=nombres_ejes)
-    fig_ingreso.update_traces(line_shape='spline', textposition="top center", 
-                              line=dict(color='#ff007f', width=4), 
-                              fillcolor='rgba(255, 0, 127, 0.15)', # Relleno transparente Magenta
-                              marker=dict(size=8, color="#ffffff"), textfont=dict(color="#ffffff"))
-    fig_ingreso.update_layout(**layout_config, height=300)
+    fig_ingreso.update_layout(**layout_config)
+    fig_ingreso.update_layout(height=480)
+    # Ya no ocultamos el eje X, solo lo mantenemos como categoría
     fig_ingreso.update_xaxes(type='category')
+    fig_ingreso.update_traces(line_shape='spline', textposition="top center", 
+                              line=dict(color='#ff007f', width=4), fillcolor='rgba(255, 0, 127, 0.15)',
+                              marker=dict(size=8, color="#ffffff"), textfont=dict(color="#ffffff"))
     st.plotly_chart(fig_ingreso, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Evolución histórica del volumen de productores adheridos al programa.</div>", unsafe_allow_html=True)
 
@@ -243,7 +249,8 @@ with col8:
     fig_genero = px.bar(df_genero, x='cadena_productiva', y='Cantidad', color='genero',
                         text='Cantidad', barmode='group', color_discrete_sequence=color_genero, labels=nombres_ejes)
     fig_genero.update_layout(**layout_config)
-    fig_genero.update_layout(height=300, legend_orientation="h", legend_y=-0.3, legend_title_text="")
+    fig_genero.update_layout(height=480, legend_title_text="")
+    # Ya no ocultamos el eje X
     fig_genero.update_traces(textposition='outside', textangle=0, cliponaxis=False, textfont=dict(color="#ffffff"))
     st.plotly_chart(fig_genero, use_container_width=True)
     st.markdown("<div class='grafica-explicacion'>Análisis de participación por sexo dentro de cada cadena productiva.</div>", unsafe_allow_html=True)
