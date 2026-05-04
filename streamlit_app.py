@@ -83,6 +83,8 @@ muni_sel = st.sidebar.multiselect("Municipio", options=muni_options)
 cadena_sel = st.sidebar.multiselect("Cadena Productiva", options=sorted(df['cadena_productiva'].dropna().unique()))
 genero_sel = st.sidebar.multiselect("Género", options=sorted(df['genero'].dropna().unique()))
 cert_sel = st.sidebar.multiselect("Estado Certificación", options=sorted(df['estado_certificacion'].dropna().astype(str).unique()))
+# NUEVO FILTRO DE VULNERABILIDAD
+vuln_sel = st.sidebar.multiselect("Vulnerabilidad Cambio Climático", options=sorted(df['Vulnerabilidad CC'].dropna().unique()))
 
 df_filtered = df.copy()
 if depto_sel: df_filtered = df_filtered[df_filtered['departamento'].isin(depto_sel)]
@@ -90,6 +92,7 @@ if muni_sel: df_filtered = df_filtered[df_filtered['municipio'].isin(muni_sel)]
 if cadena_sel: df_filtered = df_filtered[df_filtered['cadena_productiva'].isin(cadena_sel)]
 if genero_sel: df_filtered = df_filtered[df_filtered['genero'].isin(genero_sel)]
 if cert_sel: df_filtered = df_filtered[df_filtered['estado_certificacion'].isin(cert_sel)]
+if vuln_sel: df_filtered = df_filtered[df_filtered['Vulnerabilidad CC'].isin(vuln_sel)]
 
 # 4. INDICADORES MACRO (KPIs)
 k1, k2, k3, k4, k5, k6 = st.columns(6)
@@ -128,7 +131,8 @@ nombres_ejes = {
     "año_ingreso_programa": "Año de Ingreso al Programa",
     "cadena_productiva": "Cadena Productiva",
     "estado_certificacion": "Estado de Certificación",
-    "genero": "Género"
+    "genero": "Género",
+    "Vulnerabilidad CC": "Vulnerabilidad Cambio Climático"
 }
 
 color_cadena = ['#00acc1', '#ab47bc', '#ffa726', '#66bb6a', '#ef5350']
@@ -142,11 +146,14 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
     st.markdown("#### Radar Geográfico")
     fig_map = px.scatter_mapbox(df_filtered, lat="latitud", lon="longitud", color="Vulnerabilidad CC", 
-                                size="produccion_kg", hover_name="municipio", mapbox_style="open-street-map", zoom=4,
-                                labels=nombres_ejes)
-    fig_map.update_layout(**layout_config, showlegend=False, height=280)
+                                size="produccion_kg", hover_name="municipio", 
+                                hover_data={"Vulnerabilidad CC": True, "produccion_kg": True, "latitud": False, "longitud": False},
+                                mapbox_style="open-street-map", zoom=4,
+                                labels=nombres_ejes, color_discrete_sequence=px.colors.qualitative.Safe)
+    # Activamos leyenda para que se vean los labels de vulnerabilidad
+    fig_map.update_layout(**layout_config, showlegend=True, legend_orientation="h", legend_y=-0.1, height=280)
     st.plotly_chart(fig_map, use_container_width=True)
-    st.markdown("<div class='grafica-explicacion'>Visualiza la distribución geográfica de los productores y su nivel de vulnerabilidad climática. El tamaño de la burbuja representa la producción.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='grafica-explicacion'>Distribución de predios según su nivel de Vulnerabilidad al Cambio Climático. Los colores indican el grado de riesgo y el tamaño la producción.</div>", unsafe_allow_html=True)
 
 with col2:
     st.markdown("#### Ingresos vs Productividad")
@@ -167,7 +174,7 @@ with col3:
     fig_cert.update_traces(textposition='inside', textinfo='percent+label', showlegend=False)
     fig_cert.update_layout(**layout_config, height=280)
     st.plotly_chart(fig_cert, use_container_width=True)
-    st.markdown("<div class='grafica-explicacion'>Proporción de productores según su estado actual de certificación (Certificado, En Proceso, No Certificado), vital para el acceso a mercados formales.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='grafica-explicacion'>Proporción de productores según su estado actual de certificación (Certificado, En Proceso, No Certificado).</div>", unsafe_allow_html=True)
 
 with col4:
     st.markdown("#### Entorno vs Brecha")
@@ -177,7 +184,7 @@ with col4:
     fig_macro.update_layout(**layout_config, showlegend=True, height=280, legend_orientation="h", legend_y=-0.3, legend_title_text="")
     fig_macro.update_traces(marker=dict(opacity=0.7))
     st.plotly_chart(fig_macro, use_container_width=True)
-    st.markdown("<div class='grafica-explicacion'>Cruza la exposición a cultivos ilícitos (eje X) con la eficiencia agronómica (eje Y). Identifica clústers que mantienen eficiencias pese al entorno.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='grafica-explicacion'>Cruza la exposición a cultivos ilícitos (eje X) con la eficiencia agronómica (eje Y).</div>", unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -203,7 +210,7 @@ with col6:
     fig_edad.update_layout(**layout_config, showlegend=False, height=280)
     fig_edad.update_traces(texttemplate='%{text:.1f}', textposition='outside', textangle=0, cliponaxis=False, textfont=dict(color="#ffffff"))
     st.plotly_chart(fig_edad, use_container_width=True)
-    st.markdown("<div class='grafica-explicacion'>Promedio de horas de asistencia técnica recibidas segmentado por rango etario, para evaluar el alcance poblacional.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='grafica-explicacion'>Promedio de horas de asistencia técnica recibidas segmentado por rango etario.</div>", unsafe_allow_html=True)
 
 with col7:
     st.markdown("#### Ingreso al Programa")
@@ -213,7 +220,7 @@ with col7:
     fig_ingreso.update_layout(**layout_config, height=280)
     fig_ingreso.update_xaxes(type='category')
     st.plotly_chart(fig_ingreso, use_container_width=True)
-    st.markdown("<div class='grafica-explicacion'>Evolución temporal histórica del volumen de productores adheridos anualmente al programa de desarrollo.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='grafica-explicacion'>Evolución temporal histórica del volumen de productores adheridos anualmente al programa.</div>", unsafe_allow_html=True)
 
 with col8:
     st.markdown("#### Equidad por Cadena")
@@ -223,10 +230,10 @@ with col8:
     fig_genero.update_layout(**layout_config, height=280, legend_orientation="h", legend_y=-0.3, legend_title_text="")
     fig_genero.update_traces(textposition='outside', textangle=0, cliponaxis=False, textfont=dict(color="#ffffff"))
     st.plotly_chart(fig_genero, use_container_width=True)
-    st.markdown("<div class='grafica-explicacion'>Analiza la brecha de género mostrando la cantidad de participantes por sexo dentro de cada cultivo o cadena productiva.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='grafica-explicacion'>Analiza la participación por sexo dentro de cada cadena productiva.</div>", unsafe_allow_html=True)
 
 st.markdown("---")
 
 # 8. MATRIZ DE DATOS COMPACTA
 st.markdown("#### Matriz Transaccional de Productores")
-st.dataframe(df_filtered[['id_limpio', 'departamento', 'municipio', 'cadena_productiva', 'genero', 'categoria_edad', 'estado_certificacion', 'brecha_productividad_%', 'ingresos_anuales_cop']], height=200, use_container_width=True)
+st.dataframe(df_filtered[['id_limpio', 'departamento', 'municipio', 'cadena_productiva', 'genero', 'categoria_edad', 'estado_certificacion', 'Vulnerabilidad CC', 'brecha_productividad_%', 'ingresos_anuales_cop']], height=200, use_container_width=True)
