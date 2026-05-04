@@ -187,7 +187,7 @@ with c3:
     st.plotly_chart(fig_cert, use_container_width=True)
 
 with c4:
-    st.markdown("#### Entorno vs Brecha")
+    st.markdown("#### Exposición a cultivos vs Brecha de productividad")
     # TEXTO ELIMINADO PARA LIMPIAR LA GRÁFICA
     fig_macro = px.scatter(df_filtered, x="promedio_coca_ha_5y", y="brecha_productividad_%", 
                            color="cadena_productiva", size="area_ha",
