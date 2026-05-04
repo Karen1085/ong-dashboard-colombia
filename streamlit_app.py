@@ -48,6 +48,13 @@ st.markdown("---")
 @st.cache_data
 def load_data():
     df = pd.read_excel("Base_Maestra_ONG_PowerBI.xlsx")
+    
+    # CORRECCIÓN DE DUPLICIDAD ESPACIAL
+    if 'id_limpio' in df.columns:
+        df = df.drop_duplicates(subset=['id_limpio'], keep='first')
+    elif 'productor_id' in df.columns:
+        df = df.drop_duplicates(subset=['productor_id'], keep='first')
+        
     if 'origen_coordenada' not in df.columns:
         np.random.seed(42)
         df['origen_coordenada'] = np.where(np.random.rand(len(df)) > 0.15, 'Coordenada Original', 'Imputación Espacial')
