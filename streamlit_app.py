@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import numpy as np
-import numpy as np
+
 
 # 1. CONFIGURACIÓN DE INTERFAZ CORPORATIVA (ESTILO CYBERPUNK / NEON)
 st.set_page_config(page_title="Prueba Técnica Karen Atis", layout="wide", initial_sidebar_state="expanded")
