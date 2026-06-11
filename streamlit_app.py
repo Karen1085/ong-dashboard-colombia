@@ -201,13 +201,13 @@ with c4:
     st.plotly_chart(fig_macro, use_container_width=True)
 
 # ==========================================
-# 7. PRIMERA FILA: TEXTOS EXPLICATIVOS
+# 7. PRIMERA FILA: TEXTOS EXPLICATIVO
 # ==========================================
 t1, t2, t3, t4 = st.columns(4)
 with t1: st.markdown("<div class='grafica-explicacion'>Visualiza la distribución geográfica de los productores junto con su nivel de vulnerabilidad climática. El tamaño de cada burbuja representa el volumen de producción, facilitando identificar donde se concentra la producción y el nivel de riesgo ambiental al que están expuestos esos cultivos clave.</div>", unsafe_allow_html=True)
 with t2: st.markdown("<div class='grafica-explicacion'>Compara la productividad (Kg/Ha) frente a los ingresos. La productividad sostenida eleva los ingresos, segmentado por el tipo de cultivo. Cada punto representa una área especifica de cultivo (finca) entre más a la derecha, mayor es su volumen de cosecha, y entre más arriba, más ingresos. .</div>", unsafe_allow_html=True)
 with t3: st.markdown("<div class='grafica-explicacion'>Proporción de productores según su estado actual de certificación.</div>", unsafe_allow_html=True)
-with t4: st.markdown("<div class='grafica-explicacion'>Cruza la exposición a cultivos ilícitos (eje X) con la brecha de productividad (eje Y); cada burbuja representa un productor. Los productores ubicados en la parte superior derecha corresponden a aquellos que alcanzan altos niveles de productividad —muy por encima de la media— a pesar de operar en territorios históricamente afectados por la presión de economías ilegales.</div>", unsafe_allow_html=True)
+with t4: st.markdown("<div class='grafica-explicacion'>Cruza la exposición a cultivos ilícitos (Eje X) con la brecha de productividad (Eje Y); cada burbuja representa un productor. Los productores ubicados en la parte superior derecha corresponden a aquellos que alcanzan altos niveles de productividad —muy por encima de la media— a pesar de operar en territorios históricamente afectados por la presión de economías ilegales.</div>", unsafe_allow_html=True)
 
 st.markdown("---")
 
